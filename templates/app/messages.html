@@ -1,0 +1,88 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "Xabarlar" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% if can_send_messages %}{% t "Xabarlar markazi" %}{% else %}{% t "Xabarlar" %}{% endif %}</h1>
+    <p class="page-head__desc">{% t "Tizim bildirishnomalari (yuborildi, qaytarildi, qabul qilindi) va administrator e'lonlari." %}</p>
+  </div>
+</header>
+
+<div class="inbox{% if not can_send_messages %} inbox--single{% endif %}">
+  {% if can_send_messages %}
+    <aside class="card" aria-label="{% t 'Suhbatlar' %}">
+      <div class="card__head"><h2>{% t "Suhbatlar" %}</h2></div>
+      <ul class="thread-list">
+        <li>
+          <a href="{% url 'app:message_inbox' %}" class="{% if thread_profile.pk == current_profile.pk %}is-active{% endif %}">
+            <strong>{% t "Hammaga e'lon" %}</strong>
+            <span class="meta">{% t "Qabul qiluvchi tanlanmasa - hammaga" %}</span>
+          </a>
+        </li>
+        {% for user in thread_users %}
+          {% if user.pk != current_profile.pk %}
+            <li>
+              <a href="{% url 'app:message_thread' user.pk %}" class="{% if user.pk == thread_profile.pk %}is-active{% endif %}">
+                <span>{{ user }}</span>
+                <span class="meta">{% if user.account %}@{{ user.account.username }}{% else %}{% t "Login biriktirilmagan" %}{% endif %}</span>
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </aside>
+  {% endif %}
+
+  <div class="stack">
+    {% if can_send_messages %}
+      <section class="card">
+        <div class="card__head">
+          <h2>{% if thread_profile.pk == current_profile.pk %}{% t "Yangi xabar" %}{% else %}{% t "{name} uchun xabar" name=thread_profile %}{% endif %}</h2>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="card__body form-grid">
+            {% for error in message_form.non_field_errors %}
+              <div class="field field--full"><div class="alert error" role="alert">{{ error }}</div></div>
+            {% endfor %}
+            {% for field in message_form %}
+              <div class="field field--full{% if field.errors %} has-error{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<span class="field__help">{{ field.help_text }}</span>{% endif %}
+                {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+          <div class="card__foot">
+            <button type="submit" class="btn btn--primary">{% t "Yuborish" %}</button>
+          </div>
+        </form>
+      </section>
+    {% endif %}
+
+    <section class="card">
+      {% if show_broadcast_messages %}
+        <input type="radio" name="inbox-tab" id="tab-personal" class="tabs__input" checked>
+        <input type="radio" name="inbox-tab" id="tab-broadcast" class="tabs__input">
+        <div class="tabs__bar" role="tablist">
+          <label for="tab-personal" class="tabs__btn">{% t "Shaxsiy" %} <span class="tag">{{ personal_messages|length }}</span></label>
+          <label for="tab-broadcast" class="tabs__btn">{% t "Umumiy" %} <span class="tag">{{ broadcast_messages|length }}</span></label>
+        </div>
+        <div class="tabs__panel tabs__panel--personal">
+          {% include "app/_message_list.html" with items=personal_messages empty_text="Hozircha shaxsiy xabar yo'q." %}
+        </div>
+        <div class="tabs__panel tabs__panel--broadcast">
+          {% include "app/_message_list.html" with items=broadcast_messages empty_text="Hozircha e'lon yo'q." %}
+        </div>
+      {% else %}
+        <div class="card__head"><h2>{% t "Shaxsiy xabarlar" %}</h2></div>
+        {% include "app/_message_list.html" with items=personal_messages empty_text="Hozircha xabar yo'q." %}
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

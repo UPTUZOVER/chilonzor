@@ -1,0 +1,105 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "APK ishlar" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% t "APK ishlar" %}</h1>
+    <p class="page-head__desc">{% t "Botdan kelgan APK fayllar. Kursant ishni oladi, IP, domen va Telegram ID topib Chilonzorga yuboradi." %}</p>
+  </div>
+  <div class="page-head__actions">
+    <details class="legend">
+      <summary class="btn">{% t "Rang izohi" %}</summary>
+      <div class="legend__panel" role="note">
+        {% for item in legend %}
+          <div class="legend__row">
+            <span class="mark {{ item.color }}" aria-hidden="true">{{ item.code }}</span>
+            <span><strong>{{ item.label }}</strong> <span class="legend__hint">— {{ item.hint }}</span></span>
+          </div>
+        {% endfor %}
+      </div>
+    </details>
+    {% if can_manage %}
+      <a href="{% url 'apk:kursant_list' %}" class="btn">{% t "Kursantlar" %}</a>
+      <a href="{% url 'apk:api_clients' %}" class="btn">{% t "API kalitlari" %}</a>
+    {% endif %}
+  </div>
+</header>
+
+{% include "apk/_toolbar.html" %}
+
+{% if kursant_count == 0 %}
+  <div class="alert warning">
+    {% t "Hali birorta kursant qo'shilmagan - ishlarni olish uchun kursant kerak." %}
+    {% if can_manage %}<a href="{% url 'apk:kursant_create' %}">{% t "Kursant qo'shish" %}</a>{% endif %}
+  </div>
+{% endif %}
+
+<section class="table-card">
+  <table class="table table--stack">
+    <thead>
+      <tr>
+        <th class="col-num" scope="col">&#8470;</th>
+        <th scope="col">{% t "APK fayl" %}</th>
+        <th scope="col">{% t "Guruh" %}</th>
+        <th class="col-count" scope="col" title="{% t 'IP / domen / Telegram ID' %}">{% t "Topilma" %}</th>
+        <th scope="col">{% t "Holat" %}</th>
+        <th scope="col">{% t "Kursant" %}</th>
+        <th class="col-action" scope="col"><span class="sr-only">{% t "Amal" %}</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in submissions %}
+        <tr data-href="{% url 'apk:submission_detail' item.pk %}">
+          <td class="col-num" data-label="&#8470;">{{ item.pk }}</td>
+          <td data-label="{% t 'APK fayl' %}">
+            <div>
+              <a href="{% url 'apk:submission_detail' item.pk %}" class="cell-title">{{ item.file_name }}</a>
+              <span class="cell-sub">
+                {{ item.sender_name|default:"-" }}{% if item.sender_username_display %} · {{ item.sender_username_display }}{% endif %}
+                · {{ item.created_at|date:"d.m.Y H:i" }}
+                {% if item.duplicate_of_id %} · <span class="tag">{% t "takror" %} #{{ item.duplicate_of_id }}</span>{% endif %}
+              </span>
+            </div>
+          </td>
+          <td data-label="{% t 'Guruh' %}">
+            <div>
+              {{ item.chat_title|default:"-" }}
+              {% if item.chat_type %}<span class="cell-sub">{{ item.chat_type }}</span>{% endif %}
+            </div>
+          </td>
+          <td class="col-count" data-label="{% t 'IP / Domen / TG' %}">
+            <span><span title="{% t 'IP manzil' %}">{{ item.ip_count }}</span> / <span title="{% t 'Domen' %}">{{ item.domain_count }}</span> / <span title="{% t 'Telegram ID' %}">{{ item.telegram_count }}</span></span>
+          </td>
+          <td data-label="{% t 'Holat' %}"><span class="status {{ item.status_color }}">{{ item.status_label }}</span></td>
+          <td data-label="{% t 'Kursant' %}">
+            {% if item.assigned_to %}
+              <span class="assignee">
+                <span class="mark {{ item.status_color }}" title="{{ item.status_label }}">{{ item.status_code }}</span>
+                {{ item.assigned_to }}
+              </span>
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </td>
+          <td class="col-action" data-label="">
+            {% if item.status == "new" and is_kursant_user %}
+              <form method="post" action="{% url 'apk:submission_claim' item.pk %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--sm">{% t "Olish" %}</button>
+              </form>
+            {% elif item.assigned_to_id == current_profile.pk %}
+              <span class="meta">{% t "Sizda" %}</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="empty" data-label="">{% if is_filtered %}{% t "Qidiruv bo'yicha APK topilmadi." %}{% else %}{% t "Hozircha APK yo'q." %}{% endif %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "apk/_pager.html" %}
+</section>
+{% endblock %}

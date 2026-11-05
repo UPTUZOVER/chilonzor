@@ -1,0 +1,242 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}#{{ submission.pk }} {{ submission.file_name }}{% endblock %}
+
+{% block nav_extra %}
+<a href="{% url 'apk:submission_list' %}" class="nav__link nav__link--back">&larr; {% t "Jadval" %}</a>
+{% endblock %}
+
+{% block content %}
+<div class="work-page">
+
+  {# --- Sarlavha: qaysi APK, qaysi bosqich, asosiy amallar --- #}
+  <section class="work-head" aria-labelledby="workTitle">
+    <div class="work-head__top">
+      <h1 class="work-head__title" id="workTitle">
+        <span>APK #{{ submission.pk }}</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span class="work-head__file">{{ submission.file_name }}</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span class="work-head__meta">{{ submission.file_size_display }}</span>
+        <span class="status {{ submission.status_color }}">{{ submission.status_label }}</span>
+      </h1>
+
+      <div class="work-head__actions">
+        {% if can_claim %}
+          <form method="post" action="{% url 'apk:submission_claim' submission.pk %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--primary">{% t "Ishni olish" %}</button>
+          </form>
+        {% endif %}
+
+        {% if can_edit %}
+          {% t "Ish qaytarib berilsinmi? Boshqa kursant olishi mumkin bo'ladi." as release_confirm %}
+          <form method="post" action="{% url 'apk:submission_release' submission.pk %}" class="inline-form" data-confirm="{{ release_confirm }}">
+            {% csrf_token %}
+            <button type="submit" class="btn">{% t "Qaytarib berish" %}</button>
+          </form>
+          {% t "Tahlil izohi saqlanmagan. Izohsiz yuborilsinmi?" as note_guard %}
+          <form method="post" action="{% url 'apk:submission_send' submission.pk %}" class="inline-form" data-guard-note="{{ note_guard }}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--primary"{% if not finding_total %} disabled title="{% t 'Avval kamida bitta qiymat kiriting' %}"{% endif %}>{% t "Chilonzorga yuborish" %}</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="work-head__bottom">
+      <p class="work-head__owner">
+        {% if submission.assigned_to %}
+          {% t "Kursant" %}: <strong>{{ submission.assigned_to }}</strong>
+        {% else %}
+          {% t "Hali hech kimga biriktirilmagan" %}
+        {% endif %}
+        · {% t "Kelgan" %}: {{ submission.created_at|date:"d.m.Y H:i" }}
+        {% if submission.return_count %} · {% t "Qaytarilgan" %}: {{ submission.return_count }} {% t "marta" %}{% endif %}
+      </p>
+
+      <div class="work-head__actions">
+        <a href="{% url 'apk:submission_download' submission.pk %}" class="btn btn--sm">{% t "Yuklab olish" %}</a>
+        {% if can_manage %}
+          {% t "APK fayl va ish butunlay o'chirilsinmi?" as delete_confirm %}
+          <form method="post" action="{% url 'apk:submission_delete' submission.pk %}" class="inline-form" data-confirm="{{ delete_confirm }}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--sm btn--danger">{% t "O'chirish" %}</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <p class="notice notice--warning" role="note">
+      <span aria-hidden="true">&#9888;</span>
+      <span>{% t "Bu fayl zararli bo'lishi mumkin. Faqat himoyalangan muhitda (virtual mashina, emulyator) oching." %}</span>
+    </p>
+  </section>
+
+  {# --- Chilonzor qaytargan bo'lsa: kamchiliklar --- #}
+  {% if submission.status == "returned" and submission.review_note %}
+    <section class="return-note" role="alert">
+      <div class="return-note__head">
+        {% t "Chilonzor kamchiliklarni yozdi" %}
+        <span class="meta">{{ submission.reviewed_by|default:"" }} · {{ submission.reviewed_at|date:"d.m.Y H:i" }}</span>
+      </div>
+      <p>{{ submission.review_note|linebreaksbr }}</p>
+    </section>
+  {% endif %}
+
+  {# --- Chilonzor qarori --- #}
+  {% if can_review %}
+    <section class="card">
+      <div class="card__head">
+        <h2>{% t "Chilonzor qarori" %}</h2>
+        <span class="meta">{% t "Qaytarishda kamchiliklarni yozish shart" %}</span>
+      </div>
+      <form method="post" action="{% url 'apk:submission_review' submission.pk %}">
+        {% csrf_token %}
+        <div class="card__body">
+          <div class="field">
+            <label for="{{ review_form.note.id_for_label }}">{{ review_form.note.label }}</label>
+            {{ review_form.note }}
+          </div>
+        </div>
+        <div class="card__foot">
+          <button type="submit" name="decision" value="return" class="btn btn--danger">{% t "Qaytarish" %}</button>
+          <button type="submit" name="decision" value="accept" class="btn btn--primary">{% t "Qabul qilish" %}</button>
+        </div>
+      </form>
+    </section>
+  {% endif %}
+
+  {# --- Botdan kelgan ma'lumot --- #}
+  <section class="card">
+    <div class="card__head"><h2>{% t "Botdan kelgan ma'lumot" %}</h2></div>
+    <div class="card__body">
+      <dl class="meta-grid">
+        <div><dt>{% t "Yuborgan profil" %}</dt><dd>{{ submission.sender_name|default:"-" }}</dd></div>
+        <div><dt>Username</dt><dd>{{ submission.sender_username_display|default:"-" }}</dd></div>
+        <div><dt>User ID</dt><dd class="mono">{{ submission.sender_user_id|default_if_none:"-" }}</dd></div>
+        <div><dt>{% t "Guruh nomi" %}</dt><dd>{{ submission.chat_title|default:"-" }}</dd></div>
+        <div><dt>{% t "Guruh turi" %}</dt><dd>{{ submission.chat_type|default:"-" }}</dd></div>
+        <div><dt>Chat ID</dt><dd class="mono">{{ submission.chat_id|default_if_none:"-" }}</dd></div>
+      </dl>
+
+      {% if same_file_submissions %}
+        <div class="dup-note notice notice--info">
+          <span>{% t "Bu fayl oldin ham kelgan" %}:</span>
+          {% for item in same_file_submissions %}
+            <a href="{% url 'apk:submission_detail' item.pk %}">#{{ item.pk }}</a>{% if not forloop.last %},{% endif %}
+          {% endfor %}
+          {% if same_file_finding_count and can_edit %}
+            <form method="post" action="{% url 'apk:findings_copy' submission.pk %}" class="inline-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--sm">{% t "Oldingi topilmalarni ko'chirish" %}</button>
+            </form>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {# --- Topilmalar --- #}
+  <section class="card work-findings">
+    <div class="card__head">
+      <h2>{% t "Topilmalar" %} <span class="meta">({{ finding_total }})</span></h2>
+    </div>
+    <div class="card__body">
+      {% if finding_total %}
+        <div class="findings">
+          {% for group in finding_groups %}
+            <div class="findings__col">
+              <h3>{{ group.label }} <span class="meta">{{ group.items|length }}</span></h3>
+              {% for finding in group.items %}
+                <div class="finding">
+                  <code>{{ finding.value }}</code>
+                  {% if finding.other_count %}
+                    <a class="finding__other" href="{% url 'apk:submission_list' %}?q={{ finding.value|urlencode }}"
+                       title="{% t 'Boshqa APK larda ham uchragan' %}">+{{ finding.other_count }} APK</a>
+                  {% endif %}
+                  <button type="button" class="btn btn--icon" data-copy="{{ finding.value }}"
+                          aria-label="{% t 'Nusxalash' %}" data-copied="{% t 'Nusxalandi' %}" title="{% t 'Nusxalash' %}">&#10697;</button>
+                  {% if can_edit %}
+                    {% t "Qiymat o'chirilsinmi?" as finding_confirm %}
+                    <form method="post" action="{% url 'apk:finding_delete' submission.pk finding.pk %}" class="inline-form" data-confirm="{{ finding_confirm }}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn--icon is-danger" aria-label="{% t "O'chirish" %}" title="{% t "O'chirish" %}">&times;</button>
+                    </form>
+                  {% endif %}
+                </div>
+              {% empty %}
+                <p class="meta">—</p>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted">{% t "Hali topilma kiritilmagan." %}</p>
+      {% endif %}
+    </div>
+
+    {% if can_edit %}
+      <form method="post" action="{% url 'apk:finding_add' submission.pk %}" class="add-form">
+        {% csrf_token %}
+        {% if findings_form.non_field_errors %}
+          <div class="add-form__errors">
+            {% for error in findings_form.non_field_errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+          </div>
+        {% endif %}
+        {% for field in findings_form %}
+          <div class="field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<span class="field__help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</span>{% endif %}
+            {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+          </div>
+        {% endfor %}
+        <div class="add-form__submit">
+          <button type="submit" class="btn">{% t "Qo'shish" %}</button>
+        </div>
+      </form>
+    {% endif %}
+  </section>
+
+  {# --- Izoh va tarix --- #}
+  <div class="grid-2">
+    <section class="card">
+      <div class="card__head"><h2>{% t "Tahlil izohi" %}</h2></div>
+      <div class="card__body">
+        {% if can_edit %}
+          <form method="post" action="{% url 'apk:analysis_note' submission.pk %}" class="note-form" data-note-form>
+            {% csrf_token %}
+            <div class="field">
+              <label for="{{ note_form.analysis_note.id_for_label }}" class="sr-only">{% t "Tahlil izohi" %}</label>
+              {{ note_form.analysis_note }}
+            </div>
+            <div class="form-actions">
+              <span class="note-form__dirty" data-note-dirty hidden>{% t "Saqlanmagan o'zgarish bor" %}</span>
+              <button type="submit" class="btn">{% t "Saqlash" %}</button>
+            </div>
+          </form>
+        {% else %}
+          <p>{{ submission.analysis_note|default:"-"|linebreaksbr }}</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card__head"><h2>{% t "Ish tarixi" %}</h2></div>
+      <div class="card__body">
+        <ul class="history">
+          {% for event in events %}
+            <li>
+              <span class="history__time">{{ event.created_at|date:"d.m.Y H:i" }}</span>
+              <strong>{{ event.action_label }}</strong>{% if event.actor %} · {{ event.actor }}{% endif %}
+              {% if event.note %}<div class="history__note">{{ event.note|linebreaksbr }}</div>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

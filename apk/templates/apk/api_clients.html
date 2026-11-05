@@ -1,0 +1,107 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "API kalitlari" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% t "API kalitlari" %}</h1>
+    <p class="page-head__desc">{% t "Bot APK ni shu kalit bilan yuboradi. Kalit MVD hisobiga bog'lanadi va yozuvlarda manba sifatida ko'rinadi." %}</p>
+  </div>
+  <div class="page-head__actions">
+    <a href="{% url 'apk:submission_list' %}" class="btn">{% t "APK ishlar" %}</a>
+  </div>
+</header>
+
+<div class="stack">
+  {% if new_token %}
+    <section class="card token-box" role="status">
+      <div class="card__head"><h2>{% t "Yangi kalit" %}: {{ new_client.name }}</h2></div>
+      <div class="card__body">
+        <p class="notice notice--warning">{% t "Kalitni hozir nusxalab oling - u qayta ko'rsatilmaydi." %}</p>
+        <code>{{ new_token }}</code>
+        <div class="form-actions card__note">
+          <button type="button" class="btn btn--sm" data-copy="{{ new_token }}" aria-label="{% t 'Nusxalash' %}" data-copied="{% t 'Nusxalandi' %}">{% t "Nusxalash" %}</button>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card__head"><h2>{% t "Yangi kalit yaratish" %}</h2></div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="card__body form-grid">
+          {% for field in form %}
+            <div class="field field--full{% if field.errors %} has-error{% endif %}">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<span class="field__help">{{ field.help_text }}</span>{% endif %}
+              {% for error in field.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="card__foot">
+          <button type="submit" class="btn btn--primary">{% t "Kalit yaratish" %}</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="card__head"><h2>{% t "Botni ulash" %}</h2></div>
+      <div class="card__body">
+<pre class="code-sample">curl -X POST {{ api_url }} \
+  -H "Authorization: Bearer &lt;kalit&gt;" \
+  -F "file=@app.apk" \
+  -F "profile_name=Ўткир" \
+  -F "username=@salom6233" \
+  -F "user_id=5907562354" \
+  -F "title=My music" \
+  -F "type=supergroup" \
+  -F "chat_id=-1003542328393"</pre>
+      </div>
+    </section>
+  </div>
+
+  <section class="table-card">
+    <table class="table table--stack">
+      <thead>
+        <tr>
+          <th scope="col">{% t "Nomi" %}</th>
+          <th scope="col">{% t "MVD hisobi" %}</th>
+          <th scope="col">{% t "Kalit boshi" %}</th>
+          <th scope="col">{% t "Holat" %}</th>
+          <th scope="col">{% t "Oxirgi so'rov" %}</th>
+          <th class="col-action" scope="col"><span class="sr-only">{% t "Amal" %}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for client in clients %}
+          <tr>
+            <td data-label="{% t 'Nomi' %}"><span class="cell-title">{{ client.name }}</span></td>
+            <td data-label="{% t 'MVD hisobi' %}"><span>{{ client.user }} <span class="meta">@{{ client.user.account.username }}</span></span></td>
+            <td data-label="{% t 'Kalit boshi' %}"><code>{{ client.token_prefix }}…</code></td>
+            <td data-label="{% t 'Holat' %}">{% if client.is_active %}<span class="status st-accepted">{% t "Faol" %}</span>{% else %}<span class="status st-returned">{% t "O'chirilgan" %}</span>{% endif %}</td>
+            <td data-label="{% t "Oxirgi so'rov" %}">{{ client.last_used_at|date:"d.m.Y H:i"|default:"-" }}</td>
+            <td class="col-action" data-label="">
+              <form method="post" action="{% url 'apk:api_client_toggle' client.pk %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--sm">{% if client.is_active %}{% t "O'chirib qo'yish" %}{% else %}{% t "Yoqish" %}{% endif %}</button>
+              </form>
+              {% t "API kaliti butunlay o'chirilsinmi? Bot bu kalit bilan yubora olmay qoladi." as delete_confirm %}
+              <form method="post" action="{% url 'apk:api_client_delete' client.pk %}" class="inline-form" data-confirm="{{ delete_confirm }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--sm btn--danger">{% t "O'chirish" %}</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="empty" data-label="">{% t "Hali kalit yaratilmagan." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "Ko'rib chiqish" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% t "Ko'rib chiqish navbati" %}</h1>
+    <p class="page-head__desc">{% t "Kursantlar yuborgan, Chilonzor qarorini kutayotgan ishlar. Eng uzoq kutgani tepada; {hours} soatdan oshgani qizil chiziq bilan belgilanadi." hours=overdue_hours %}</p>
+  </div>
+</header>
+
+{% include "apk/_toolbar.html" %}
+
+<div class="stack">
+  <section class="table-card" aria-label="{% t 'Qaror kutayotgan ishlar' %}">
+    <table class="table table--stack">
+      <thead>
+        <tr>
+          <th class="col-num" scope="col">&#8470;</th>
+          <th scope="col">{% t "APK" %}</th>
+          <th scope="col">{% t "Kursant" %}</th>
+          <th class="col-count" scope="col">{% t "Topilmalar" %}</th>
+          <th scope="col">{% t "Yuborilgan" %}</th>
+          <th scope="col">{% t "Kutish" %}</th>
+          <th class="col-arrow" scope="col"><span class="sr-only">{% t "Ochish" %}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in pending %}
+          <tr data-href="{% url 'apk:submission_detail' item.pk %}"{% if item.is_overdue %} class="is-overdue"{% endif %}>
+            <td class="col-num" data-label="&#8470;">{{ item.pk }}</td>
+            <td data-label="{% t 'APK' %}">
+              <div>
+                <a href="{% url 'apk:submission_detail' item.pk %}" class="cell-title">{{ item.file_name }}</a>
+                <span class="cell-sub">{{ item.chat_title|default:"-" }}{% if item.return_count %} · {% t "qaytarilgan" %}: {{ item.return_count }}{% endif %}</span>
+              </div>
+            </td>
+            <td data-label="{% t 'Kursant' %}">{{ item.assigned_to|default:"-" }}</td>
+            <td class="col-count" data-label="{% t 'IP / Domen / TG' %}">{{ item.ip_count }} / {{ item.domain_count }} / {{ item.telegram_count }}</td>
+            <td data-label="{% t 'Yuborilgan' %}">{{ item.sent_at|date:"d.m.Y H:i" }}</td>
+            <td data-label="{% t 'Kutish' %}"><span class="wait">{{ item.wait_label }}</span></td>
+            <td class="col-arrow" data-label="" aria-hidden="true">&rarr;</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="empty" data-label="">{% t "Ko'rib chiqishni kutayotgan ish yo'q." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "apk/_pager.html" %}
+  </section>
+
+  <section class="card">
+    <div class="card__head">
+      <h2>{% t "Oxirgi qarorlar" %}</h2>
+      <span class="meta">{% t "so'nggi 50 ta" %}</span>
+    </div>
+    <table class="table table--stack">
+      <thead>
+        <tr>
+          <th class="col-num" scope="col">&#8470;</th>
+          <th scope="col">{% t "APK" %}</th>
+          <th scope="col">{% t "Kursant" %}</th>
+          <th scope="col">{% t "Qaror" %}</th>
+          <th scope="col">{% t "Kim" %}</th>
+          <th scope="col">{% t "Qachon" %}</th>
+          <th scope="col">{% t "Izoh" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in decided %}
+          <tr data-href="{% url 'apk:submission_detail' item.pk %}">
+            <td class="col-num" data-label="&#8470;">{{ item.pk }}</td>
+            <td data-label="{% t 'APK' %}"><a href="{% url 'apk:submission_detail' item.pk %}">{{ item.file_name }}</a></td>
+            <td data-label="{% t 'Kursant' %}">{{ item.assigned_to|default:"-" }}</td>
+            <td data-label="{% t 'Qaror' %}"><span class="status {{ item.status_color }}">{{ item.status_label }}</span></td>
+            <td data-label="{% t 'Kim' %}">{{ item.reviewed_by|default:"-" }}</td>
+            <td data-label="{% t 'Qachon' %}">{{ item.reviewed_at|date:"d.m.Y H:i" }}</td>
+            <td data-label="{% t 'Izoh' %}" class="muted">{{ item.review_note|truncatechars:80|default:"-" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="empty" data-label="">{% t "Hozircha qaror yo'q." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,1692 @@
+/* ==========================================================================
+   Chilonzor · APK tahlil — asosiy uslublar
+   Qiymatlar faqat tokens.css dagi o'zgaruvchilardan olinadi.
+   Tuzilishi:
+     1. Asos            6. Holat yorliqlari     11. Ish sahifasi
+     2. Header          7. Jadval               12. Navbat va statistika
+     3. Sahifa qismlari 8. Filtr va sahifalash  13. Xabarlar, kirish
+     4. Tugmalar        9. Rang izohi           14. Moslashuvchanlik
+     5. Formalar       10. Karta                15. Harakatni kamaytirish
+   ========================================================================== */
+
+/* 1. Asos ---------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+dl,
+dd {
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--fs-page);
+  font-weight: var(--fw-bold);
+  line-height: 1.3;
+}
+
+h2 {
+  font-size: var(--fs-section);
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+}
+
+h3 {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+}
+
+a {
+  color: var(--c-brand);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--c-brand-hover);
+  text-decoration: underline;
+}
+
+code,
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-brand);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.muted {
+  color: var(--c-text-2);
+}
+
+.meta {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--sp-5) var(--sp-6) var(--sp-7);
+}
+
+/* 2. Header -------------------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--topbar-h);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  height: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--sp-6);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-text);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+
+.brand:hover {
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.brand__mark {
+  width: 24px;
+  height: 24px;
+  color: var(--c-brand);
+  flex-shrink: 0;
+}
+
+.brand__sep {
+  color: var(--c-text-2);
+  font-weight: var(--fw-regular);
+}
+
+.nav {
+  display: flex;
+  align-items: stretch;
+  gap: var(--sp-5);
+  height: 100%;
+}
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: 100%;
+  border-bottom: 2px solid transparent;
+  border-top: 2px solid transparent;
+  color: var(--c-text-2);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+.nav__link:hover {
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.nav__link.is-active {
+  color: var(--c-brand);
+  border-bottom-color: var(--c-brand);
+}
+
+.nav__link--back {
+  color: var(--c-text-2);
+  font-weight: var(--fw-regular);
+}
+
+.nav__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--sp-1);
+  border-radius: 9px;
+  background: var(--c-brand);
+  color: var(--c-surface);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+}
+
+.nav__badge--danger {
+  background: var(--c-danger);
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-left: auto;
+}
+
+.lang-select {
+  height: 32px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-control);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-label);
+}
+
+.user-chip {
+  color: var(--c-text);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+.user-chip__role {
+  color: var(--c-text-2);
+  font-weight: var(--fw-regular);
+}
+
+.topbar .nav-toggle {
+  display: none;
+}
+
+/* Tungi/kunduzgi rejim tugmasi: hozirgi rejimga qarab oy yoki quyosh */
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.theme-toggle__sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle__moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle__sun {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle__moon {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .theme-toggle__sun {
+    display: block;
+  }
+}
+
+/* 3. Sahifa qismlari ----------------------------------------------------- */
+
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.page-head__desc {
+  margin-top: var(--sp-1);
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+.page-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.eyebrow {
+  margin-bottom: var(--sp-1);
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.alerts {
+  display: grid;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.alert {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-border);
+  border-left-width: 3px;
+  border-radius: var(--radius-control);
+  background: var(--c-surface);
+}
+
+.alert.success {
+  border-left-color: var(--c-success);
+}
+
+.alert.error {
+  border-left-color: var(--c-danger);
+}
+
+.alert.warning {
+  border-left-color: var(--c-warning);
+}
+
+.alert.info {
+  border-left-color: var(--c-info);
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-control);
+  font-size: var(--fs-meta);
+}
+
+.notice--warning {
+  background: var(--c-warning-bg);
+  color: var(--c-warning);
+}
+
+.notice--info {
+  background: var(--c-info-bg);
+  color: var(--c-info);
+}
+
+.empty {
+  padding: var(--sp-5) var(--sp-4);
+  color: var(--c-text-2);
+  text-align: center;
+}
+
+/* 4. Tugmalar ------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  height: var(--control-h);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-control);
+  background: var(--c-surface);
+  color: var(--c-brand);
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--c-row-hover);
+  color: var(--c-brand-hover);
+  text-decoration: none;
+}
+
+.btn--primary {
+  border-color: var(--c-brand);
+  background: var(--c-brand);
+  color: var(--c-surface);
+}
+
+.btn--primary:hover {
+  border-color: var(--c-brand-hover);
+  background: var(--c-brand-hover);
+  color: var(--c-surface);
+}
+
+.btn--danger {
+  border-color: var(--c-danger);
+  color: var(--c-danger);
+}
+
+.btn--danger:hover {
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+}
+
+.btn--sm {
+  height: 28px;
+  padding: 0 var(--sp-3);
+  font-size: var(--fs-label);
+}
+
+.btn--icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--c-text-2);
+  font-size: var(--fs-section);
+}
+
+.btn--icon:hover {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.btn--icon.is-danger:hover {
+  color: var(--c-danger);
+}
+
+.btn--icon.is-copied {
+  color: var(--c-success);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.inline-form {
+  display: inline-flex;
+  margin: 0;
+}
+
+/* 5. Formalar ------------------------------------------------------------ */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.form-grid > .field {
+  grid-column: span 6;
+}
+
+.form-grid > .field--full,
+.form-grid > .form-actions {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: grid;
+  gap: var(--sp-1);
+  align-content: start;
+  min-width: 0;
+}
+
+.field > label,
+.field__label {
+  color: var(--c-text-2);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+}
+
+.form-input {
+  width: 100%;
+  min-height: var(--control-h);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-control);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-body);
+}
+
+.form-input::placeholder {
+  color: var(--c-text-2);
+}
+
+.form-input:hover {
+  border-color: var(--c-text-2);
+}
+
+.form-input:focus {
+  border-color: var(--c-brand);
+  outline: 2px solid var(--c-brand);
+  outline-offset: 0;
+}
+
+textarea.form-input {
+  min-height: 72px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+select.form-input[multiple] {
+  min-height: 96px;
+}
+
+input[type="checkbox"].form-input,
+input[type="radio"].form-input {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  padding: 0;
+  accent-color: var(--c-brand);
+}
+
+.field.has-error .form-input {
+  border-color: var(--c-danger);
+}
+
+.field--check {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--sp-2);
+  align-self: end;
+  min-height: var(--control-h);
+}
+
+.field__help {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+.field__error {
+  color: var(--c-danger);
+  font-size: var(--fs-meta);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+/* 6. Holat yorliqlari ---------------------------------------------------- */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-tag);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.st-new { background: var(--c-neutral-bg); color: var(--c-neutral); }
+.st-progress { background: var(--c-warning-bg); color: var(--c-warning); }
+.st-sent { background: var(--c-info-bg); color: var(--c-info); }
+.st-returned { background: var(--c-danger-bg); color: var(--c-danger); }
+.st-accepted { background: var(--c-success-bg); color: var(--c-success); }
+
+/* Kursant ustunidagi kichik belgi: rang + harf */
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-tag);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.assignee {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--sp-1);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-tag);
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+/* 7. Jadval -------------------------------------------------------------- */
+
+.table-card {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-card);
+  background: var(--c-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 1;
+  height: 40px;
+  padding: 0 var(--sp-3);
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-bg);
+  color: var(--c-text-2);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table th:first-child {
+  border-top-left-radius: var(--radius-card);
+}
+
+.table th:last-child {
+  border-top-right-radius: var(--radius-card);
+}
+
+.table td {
+  height: var(--row-h);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--c-border);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover td {
+  background: var(--c-row-hover);
+}
+
+.table .col-num {
+  width: 56px;
+  color: var(--c-text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.table .col-count {
+  width: 120px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.table .col-action {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table .col-arrow {
+  width: 32px;
+  color: var(--c-text-2);
+  text-align: right;
+}
+
+.cell-title {
+  display: block;
+  font-weight: var(--fw-medium);
+  overflow-wrap: anywhere;
+}
+
+.cell-sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+tr[data-href] {
+  cursor: pointer;
+}
+
+tr.is-overdue td:first-child {
+  box-shadow: inset 3px 0 0 var(--c-danger);
+}
+
+tr.is-overdue .wait {
+  color: var(--c-danger);
+  font-weight: var(--fw-medium);
+}
+
+/* 8. Filtr va sahifalash ------------------------------------------------- */
+
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 56px;
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-card);
+  background: var(--c-surface);
+}
+
+.filterbar__search {
+  position: relative;
+  flex: 0 1 260px;
+  min-width: 200px;
+}
+
+.filterbar__search svg {
+  position: absolute;
+  top: 50%;
+  left: var(--sp-3);
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--c-text-2);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.filterbar__search .form-input {
+  padding-left: 32px;
+}
+
+.filterbar__select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-text-2);
+  font-size: var(--fs-label);
+}
+
+.filterbar__select .form-input {
+  width: auto;
+  min-width: 140px;
+}
+
+.filterbar__count {
+  margin-left: auto;
+  color: var(--c-text-2);
+  font-size: var(--fs-label);
+  white-space: nowrap;
+}
+
+.filterbar__count strong {
+  color: var(--c-text);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-top: 1px solid var(--c-border);
+  color: var(--c-text-2);
+  font-size: var(--fs-label);
+}
+
+/* 9. Rang izohi (popover) ------------------------------------------------ */
+
+.legend {
+  position: relative;
+}
+
+.legend > summary {
+  list-style: none;
+}
+
+.legend > summary::-webkit-details-marker {
+  display: none;
+}
+
+.legend__panel {
+  position: absolute;
+  top: calc(100% + var(--sp-1));
+  right: 0;
+  z-index: 10;
+  display: grid;
+  gap: var(--sp-2);
+  width: 280px;
+  padding: var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-card);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.legend__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-label);
+}
+
+.legend__hint {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+/* 10. Karta -------------------------------------------------------------- */
+
+.card {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-card);
+  background: var(--c-surface);
+}
+
+.card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.card__head .meta {
+  white-space: nowrap;
+}
+
+.card__body {
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.card__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--c-border);
+}
+
+.card__note {
+  margin-top: var(--sp-3);
+}
+
+.stack {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+  align-items: start;
+}
+
+/* 11. Ish sahifasi ------------------------------------------------------- */
+
+.work-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-height: calc(100vh - var(--topbar-h) - var(--sp-5) - var(--sp-7));
+}
+
+.work-head {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-card);
+  background: var(--c-surface);
+}
+
+.work-head__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.work-head__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  font-size: var(--fs-section);
+  font-weight: var(--fw-semibold);
+}
+
+.work-head__title .sep {
+  color: var(--c-border);
+  font-weight: var(--fw-regular);
+}
+
+.work-head__file {
+  overflow-wrap: anywhere;
+}
+
+.work-head__meta {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-regular);
+}
+
+.work-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.work-head__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.work-head__owner {
+  color: var(--c-text-2);
+  font-size: var(--fs-label);
+}
+
+.work-head__owner strong {
+  color: var(--c-text);
+  font-weight: var(--fw-medium);
+}
+
+.return-note {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--c-danger);
+  border-radius: var(--radius-card);
+  background: var(--c-danger-bg);
+}
+
+.return-note__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  color: var(--c-danger);
+  font-weight: var(--fw-semibold);
+}
+
+.return-note p {
+  margin-top: var(--sp-2);
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3) var(--sp-5);
+}
+
+.meta-grid dt {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+.meta-grid dd {
+  margin-top: 2px;
+  font-weight: var(--fw-medium);
+  overflow-wrap: anywhere;
+}
+
+.dup-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.work-findings {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.work-findings > .card__body {
+  flex: 1 1 auto;
+}
+
+.findings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-5);
+}
+
+.findings__col h3 {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-label);
+}
+
+.findings__col h3 .meta {
+  font-weight: var(--fw-regular);
+}
+
+.finding {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-height: 36px;
+  margin-bottom: var(--sp-1);
+  padding: 0 var(--sp-1) 0 var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-control);
+  background: var(--c-surface);
+}
+
+.finding code {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.finding__other {
+  color: var(--c-info);
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+}
+
+.finding .inline-form {
+  flex-shrink: 0;
+}
+
+.add-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border-top: 1px solid var(--c-border);
+}
+
+.add-form__errors {
+  grid-column: 1 / -1;
+}
+
+.add-form__submit {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-form textarea.form-input {
+  min-height: 60px;
+}
+
+.history {
+  display: grid;
+  gap: var(--sp-2);
+  list-style: none;
+  padding: 0;
+}
+
+.history li {
+  font-size: var(--fs-label);
+}
+
+.history__time {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.history__note {
+  margin-top: var(--sp-1);
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 2px solid var(--c-border);
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+.note-form {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.note-form .form-actions {
+  align-items: center;
+}
+
+.note-form__dirty {
+  margin-right: auto;
+  color: var(--c-warning);
+  font-size: var(--fs-meta);
+}
+
+.note-form__dirty[hidden] {
+  display: none;
+}
+
+/* 12. Navbat va statistika ----------------------------------------------- */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.kpi {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-card);
+  background: var(--c-surface);
+}
+
+.kpi__label {
+  color: var(--c-text-2);
+  font-size: var(--fs-label);
+}
+
+.kpi__value {
+  font-size: 28px;
+  font-weight: var(--fw-bold);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi__sub {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+}
+
+.kpi.is-alert {
+  border-top: 3px solid var(--c-warning);
+}
+
+.kpi.is-good .kpi__value {
+  color: var(--c-success);
+}
+
+.repeat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-5);
+}
+
+.repeat-grid h3 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-label);
+}
+
+.repeat-list {
+  display: grid;
+  gap: var(--sp-1);
+  list-style: none;
+  padding: 0;
+}
+
+.repeat-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  min-height: 32px;
+  padding: 0 var(--sp-2);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.repeat-list li:last-child {
+  border-bottom: 0;
+}
+
+.statbars {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.statbar {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 48px 40px;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-label);
+}
+
+.statbar__track {
+  height: 8px;
+  border-radius: var(--radius-tag);
+  background: var(--c-bg);
+  overflow: hidden;
+}
+
+.statbar__fill {
+  display: block;
+  height: 100%;
+  width: var(--w, 0%);
+  border-radius: var(--radius-tag);
+}
+
+.statbar__fill.st-new { background: var(--c-neutral); }
+.statbar__fill.st-progress { background: var(--c-warning); }
+.statbar__fill.st-sent { background: var(--c-info); }
+.statbar__fill.st-returned { background: var(--c-danger); }
+.statbar__fill.st-accepted { background: var(--c-success); }
+
+.statbar__value {
+  font-weight: var(--fw-semibold);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.statbar__share {
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+  text-align: right;
+}
+
+.vbars {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--sp-2);
+  height: 180px;
+  padding-top: var(--sp-5);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.vbar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.vbar__fill {
+  display: block;
+  height: var(--h, 0%);
+  min-height: 2px;
+  border-radius: var(--radius-tag) var(--radius-tag) 0 0;
+  background: var(--c-brand);
+}
+
+.vbar__value {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--h, 0%) + var(--sp-1));
+  transform: translateX(-50%);
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.vbar:hover .vbar__fill {
+  background: var(--c-brand-hover);
+}
+
+.vbars__labels {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+  text-align: center;
+}
+
+/* 13. Xabarlar va kirish ------------------------------------------------- */
+
+.inbox {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--sp-4);
+  align-items: start;
+}
+
+.inbox--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.thread-list {
+  display: grid;
+  list-style: none;
+  padding: var(--sp-2);
+}
+
+.thread-list a {
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-control);
+  color: var(--c-text);
+}
+
+.thread-list a:hover {
+  background: var(--c-row-hover);
+  text-decoration: none;
+}
+
+.thread-list a.is-active {
+  background: var(--c-row-hover);
+  box-shadow: inset 2px 0 0 var(--c-brand);
+}
+
+.tabs__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tabs__bar {
+  display: flex;
+  gap: var(--sp-5);
+  padding: 0 var(--sp-5);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.tabs__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: 44px;
+  border-bottom: 2px solid transparent;
+  color: var(--c-text-2);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+
+.tabs__panel {
+  display: none;
+}
+
+#tab-personal:checked ~ .tabs__bar label[for="tab-personal"],
+#tab-broadcast:checked ~ .tabs__bar label[for="tab-broadcast"] {
+  border-bottom-color: var(--c-brand);
+  color: var(--c-brand);
+}
+
+#tab-personal:focus-visible ~ .tabs__bar label[for="tab-personal"],
+#tab-broadcast:focus-visible ~ .tabs__bar label[for="tab-broadcast"] {
+  outline: 2px solid var(--c-brand);
+  outline-offset: 2px;
+}
+
+#tab-personal:checked ~ .tabs__panel--personal,
+#tab-broadcast:checked ~ .tabs__panel--broadcast {
+  display: block;
+}
+
+.message-list {
+  list-style: none;
+  padding: 0;
+}
+
+.message-list li {
+  padding: var(--sp-3) var(--sp-5);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.message-list li:last-child {
+  border-bottom: 0;
+}
+
+.message-list__top {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-1);
+}
+
+.auth {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - var(--topbar-h) - var(--sp-7) * 2);
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--sp-6);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-card);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.auth__brand {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
+  text-align: center;
+}
+
+.auth__brand .brand__mark {
+  width: 40px;
+  height: 40px;
+}
+
+.auth__form {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.auth__form .btn {
+  width: 100%;
+}
+
+.auth__note {
+  margin-top: var(--sp-4);
+  color: var(--c-text-2);
+  font-size: var(--fs-meta);
+  text-align: center;
+}
+
+.token-box code {
+  display: block;
+  margin-top: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-control);
+  background: var(--c-bg);
+  overflow-wrap: anywhere;
+}
+
+.code-sample {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-control);
+  background: var(--c-bg);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+/* 14. Moslashuvchanlik: 1280, 1024, 768, 480 ----------------------------- */
+
+@media (max-width: 1280px) {
+  .kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .shell,
+  .topbar__inner {
+    padding-left: var(--sp-5);
+    padding-right: var(--sp-5);
+  }
+
+  .nav {
+    gap: var(--sp-4);
+  }
+
+  .user-chip__role {
+    display: none;
+  }
+
+  .grid-2,
+  .repeat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inbox {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .shell,
+  .topbar__inner {
+    padding-left: var(--sp-4);
+    padding-right: var(--sp-4);
+  }
+
+  /* Menyu hamburger ichida */
+  .topbar .nav-toggle {
+    display: inline-flex;
+  }
+
+  .topbar__right .user-chip {
+    display: none;
+  }
+
+  .nav {
+    position: absolute;
+    top: var(--topbar-h);
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    height: auto;
+    padding: var(--sp-2) var(--sp-4);
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-surface);
+  }
+
+  .topbar.is-open .nav {
+    display: flex;
+  }
+
+  .nav__link {
+    height: 44px;
+    border: 0;
+  }
+
+  .nav__link.is-active {
+    box-shadow: inset 2px 0 0 var(--c-brand);
+    padding-left: var(--sp-3);
+  }
+
+  .topbar__right .lang-select {
+    display: none;
+  }
+
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-grid > .field {
+    grid-column: 1 / -1;
+  }
+
+  .filterbar__search {
+    flex: 1 1 100%;
+  }
+
+  .filterbar__count {
+    margin-left: 0;
+  }
+
+  /* Jadval kartalar ro'yxatiga aylanadi */
+  .table--stack thead {
+    display: none;
+  }
+
+  .table--stack,
+  .table--stack tbody,
+  .table--stack tr,
+  .table--stack td {
+    display: block;
+    width: 100%;
+  }
+
+  .table--stack tr {
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .table--stack tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  /* Har katak: chapda ustun nomi, o'ngda qiymat (bitta element) */
+  .table--stack td {
+    display: grid;
+    grid-template-columns: minmax(88px, 35%) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--sp-3);
+    height: auto;
+    padding: var(--sp-1) 0;
+    border: 0;
+    text-align: left;
+  }
+
+  .table--stack td > * {
+    min-width: 0;
+    justify-self: start;
+  }
+
+  .table--stack td::before {
+    content: attr(data-label);
+    color: var(--c-text-2);
+    font-size: var(--fs-meta);
+    line-height: 1.8;
+  }
+
+  .table--stack td[data-label=""] {
+    display: block;
+    padding-top: var(--sp-2);
+  }
+
+  .table--stack td[data-label=""]::before {
+    content: none;
+  }
+
+  .table--stack .col-num,
+  .table--stack .col-count,
+  .table--stack .col-action {
+    width: 100%;
+  }
+
+  .table--stack tbody tr:hover td {
+    background: transparent;
+  }
+
+  tr.is-overdue {
+    box-shadow: inset 3px 0 0 var(--c-danger);
+  }
+
+  tr.is-overdue td:first-child {
+    box-shadow: none;
+  }
+
+  .findings,
+  .meta-grid,
+  .add-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .add-form__submit {
+    padding-top: 0;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .work-page {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand__text {
+    display: none;
+  }
+
+  .kpi-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card__head,
+  .card__body,
+  .card__foot,
+  .add-form,
+  .work-head {
+    padding-left: var(--sp-3);
+    padding-right: var(--sp-3);
+  }
+
+  .vbars,
+  .vbars__labels {
+    gap: var(--sp-1);
+  }
+
+  .vbar__value {
+    display: none;
+  }
+}
+
+/* 15. Harakatni kamaytirish ---------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

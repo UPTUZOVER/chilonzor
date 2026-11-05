@@ -1,0 +1,37 @@
+{% comment %}
+Umumiy filtr qatori. Har bo'lim o'z `filters` ro'yxatini beradi:
+  filters = [{"name": "holat", "label": "Holat",
+              "options": [{"key": ..., "label": ..., "count": ...}],
+              "selected": "..."}]
+{% endcomment %}
+{% load ui_i18n %}
+{% t "Qidirish..." as default_placeholder %}
+<form method="get" class="filterbar" role="search">
+  <label class="filterbar__search">
+    <span class="sr-only">{% t "Qidirish" %}</span>
+    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6"></circle><line x1="13.5" y1="13.5" x2="18" y2="18"></line></svg>
+    <input type="search" name="q" value="{{ search }}" autocomplete="off" class="form-input"
+           placeholder="{{ search_placeholder|default:default_placeholder }}">
+  </label>
+
+  {% for filter in filters %}
+    <label class="filterbar__select">
+      {{ filter.label }}
+      <select name="{{ filter.name }}" class="form-input" onchange="this.form.submit()">
+        <option value="">{% t "Hammasi" %}</option>
+        {% for option in filter.options %}
+          <option value="{{ option.key }}"{% if option.key == filter.selected %} selected{% endif %}>{{ option.label }}{% if option.count %} ({{ option.count }}){% endif %}</option>
+        {% endfor %}
+      </select>
+    </label>
+  {% endfor %}
+
+  <button type="submit" class="btn">{% t "Qidirish" %}</button>
+  {% if is_filtered %}
+    <a href="{{ request.path }}" class="btn">{% t "Tozalash" %}</a>
+  {% endif %}
+
+  <span class="filterbar__count">
+    {% t "Natija" %}: <strong>{{ result_count }}</strong>{% if total_count %} / {{ total_count }}{% endif %}
+  </span>
+</form>

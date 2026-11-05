@@ -1,0 +1,46 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "Guruhlar" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% t "Guruhlar" %}</h1>
+    <p class="page-head__desc">{% t "MVD va Chilonzor guruhlari tizim rollarini belgilaydi - ularni o'chirish yoki qayta nomlash rollarni buzadi." %}</p>
+  </div>
+  <div class="page-head__actions">
+    <a href="{% url 'app:group_create' %}" class="btn btn--primary">{% t "Yangi guruh" %}</a>
+  </div>
+</header>
+
+<section class="table-card">
+  <table class="table table--stack">
+    <thead>
+      <tr>
+        <th scope="col">{% t "Guruh" %}</th>
+        <th class="col-count" scope="col">{% t "A'zolar" %}</th>
+        <th class="col-action" scope="col"><span class="sr-only">{% t "Amal" %}</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for group in groups %}
+        <tr>
+          <td data-label="{% t 'Guruh' %}"><span class="cell-title">{{ group.name|ui_group }}</span></td>
+          <td class="col-count" data-label="{% t "A'zolar" %}">{{ group.member_count }}</td>
+          <td class="col-action" data-label="">
+            <a href="{% url 'app:group_update' group.pk %}" class="btn btn--sm">{% t "Tahrirlash" %}</a>
+            {% t "Guruh o'chirilsinmi?" as delete_confirm %}
+            <form method="post" action="{% url 'app:group_delete' group.pk %}" class="inline-form" data-confirm="{{ delete_confirm }}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--sm btn--danger">{% t "O'chirish" %}</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3" class="empty" data-label="">{% t "Hozircha guruh yo'q." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

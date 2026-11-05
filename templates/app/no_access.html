@@ -1,0 +1,17 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "Ruxsat yo'q" %}{% endblock %}
+
+{% block content %}
+<section class="auth">
+  <div class="auth__card">
+    <div class="auth__brand">
+      {% include "app/_brand_mark.html" %}
+      <h1>{% t "Hisobingizga hali rol berilmagan" %}</h1>
+    </div>
+    <p class="muted">{% t "Administrator sizni kursant qilib qo'shgach yoki MVD / Chilonzor guruhiga biriktirgach, APK tahlil bo'limi ochiladi." %}</p>
+    <p class="auth__note">{% t "Muammo bo'lsa administratorga murojaat qiling." %}</p>
+  </div>
+</section>
+{% endblock %}

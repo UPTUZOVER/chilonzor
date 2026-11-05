@@ -1,0 +1,156 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "Statistika" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% t "Statistika" %}</h1>
+    <p class="page-head__desc">{% t "Barcha APK ishlar bo'yicha umumiy holat. Ma'lumot sahifa ochilgan paytdagi holatda." %}</p>
+  </div>
+  <div class="page-head__actions">
+    <a href="{% url 'apk:submission_list' %}" class="btn">{% t "APK ishlar" %}</a>
+    <a href="{% url 'apk:review_queue' %}" class="btn">{% t "Ko'rib chiqish" %}</a>
+  </div>
+</header>
+
+<div class="stack">
+  <section class="kpi-grid" aria-label="{% t "Asosiy ko'rsatkichlar" %}">
+    <article class="kpi">
+      <span class="kpi__label">{% t "Jami APK" %}</span>
+      <strong class="kpi__value">{{ total }}</strong>
+      <span class="kpi__sub">{% t "so'nggi 7 kunda" %}: {{ week_count }}{% if week_delta > 0 %} (+{{ week_delta }}){% elif week_delta < 0 %} ({{ week_delta }}){% endif %}</span>
+    </article>
+    <article class="kpi{% if new_count %} is-alert{% endif %}">
+      <span class="kpi__label">{% t "Olinmagan" %}</span>
+      <strong class="kpi__value">{{ new_count }}</strong>
+      <span class="kpi__sub">{% t "kursant kutmoqda" %}</span>
+    </article>
+    <article class="kpi">
+      <span class="kpi__label">{% t "Tahlilda" %}</span>
+      <strong class="kpi__value">{{ in_progress_count }}</strong>
+      <span class="kpi__sub">{% t "kursantlar ishlamoqda" %}</span>
+    </article>
+    <article class="kpi{% if sent_count %} is-alert{% endif %}">
+      <span class="kpi__label">{% t "Chilonzorda" %}</span>
+      <strong class="kpi__value">{{ sent_count }}</strong>
+      <span class="kpi__sub">{% t "qaror kutmoqda" %}</span>
+    </article>
+    <article class="kpi">
+      <span class="kpi__label">{% t "Qaytarilgan" %}</span>
+      <strong class="kpi__value">{{ returned_count }}</strong>
+      <span class="kpi__sub">{% t "tuzatilmoqda" %}</span>
+    </article>
+    <article class="kpi is-good">
+      <span class="kpi__label">{% t "Qabul qilingan" %}</span>
+      <strong class="kpi__value">{{ accepted_count }}</strong>
+      <span class="kpi__sub">{% t "yakunlangan" %}</span>
+    </article>
+  </section>
+
+  <section class="card">
+    <div class="card__head">
+      <h2>{% t "Bir nechta APK da uchragan qiymatlar" %}</h2>
+      <span class="meta">{% t "bir manbaga ishora qilishi mumkin" %}</span>
+    </div>
+    <div class="card__body">
+      {% if has_repeated %}
+        <div class="repeat-grid">
+          {% for group in repeated_groups %}
+            <div>
+              <h3>{{ group.label }} <span class="meta">{% t "APK soni" %}</span></h3>
+              {% if group.items %}
+                <ul class="repeat-list">
+                  {% for item in group.items %}
+                    <li>
+                      <a href="{% url 'apk:submission_list' %}?q={{ item.value|urlencode }}"><code>{{ item.value }}</code></a>
+                      <strong>{{ item.count }}</strong>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p class="meta">—</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted">{% t "Hozircha bir nechta APK da takrorlangan qiymat yo'q." %}</p>
+      {% endif %}
+      <p class="meta card__note">
+        {% t "Noyob qiymatlar" %}:
+        {% for card in finding_cards %}{{ card.label }} — <strong>{{ card.count }}</strong>{% if not forloop.last %} · {% endif %}{% endfor %}
+      </p>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card__head"><h2>{% t "Holatlar" %}</h2><span class="meta">{% t "jami" %} {{ total }}</span></div>
+      <div class="card__body statbars">
+        {% for row in status_rows %}
+          <div class="statbar">
+            <span>{{ row.label }}</span>
+            <span class="statbar__track"><span class="statbar__fill {{ row.color }}" style="--w: {{ row.share }}%"></span></span>
+            <span class="statbar__value">{{ row.count }}</span>
+            <span class="statbar__share">{{ row.share }}%</span>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card__head"><h2>{% t "So'nggi 14 kun" %}</h2><span class="meta">{% t "kuniga kelgan APK" %}</span></div>
+      <div class="card__body">
+        <div class="vbars" role="img" aria-label="{% t "So'nggi 14 kunda kunlik kelgan APK soni" %}">
+          {% for item in daily %}
+            <div class="vbar" style="--h: {{ item.height }}%" title="{{ item.day|date:'d.m.Y' }}: {{ item.count }}">
+              <span class="vbar__value">{{ item.count }}</span>
+              <span class="vbar__fill"></span>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="vbars__labels" aria-hidden="true">
+          {% for item in daily %}<span>{{ item.day|date:"d.m" }}</span>{% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="grid-2">
+    <section class="card">
+      <div class="card__head"><h2>{% t "Kursantlar" %}</h2></div>
+      <table class="table">
+        <thead>
+          <tr><th scope="col">{% t "Kursant" %}</th><th class="col-count" scope="col">{% t "Ishda" %}</th><th class="col-count" scope="col">{% t "Qabul qilingan" %}</th></tr>
+        </thead>
+        <tbody>
+          {% for kursant in kursants %}
+            <tr><td>{{ kursant.user }}</td><td class="col-count">{{ kursant.active_count }}</td><td class="col-count">{{ kursant.accepted_count }}</td></tr>
+          {% empty %}
+            <tr><td colspan="3" class="empty">{% t "Kursant yo'q." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="card__head"><h2>{% t "So'nggi harakatlar" %}</h2></div>
+      <div class="card__body">
+        <ul class="history">
+          {% for event in recent_events %}
+            <li>
+              <span class="history__time">{{ event.created_at|date:"d.m.Y H:i" }}</span>
+              <a href="{% url 'apk:submission_detail' event.submission_id %}">#{{ event.submission_id }}</a>
+              <strong>{{ event.action_label }}</strong>{% if event.actor %} · {{ event.actor }}{% endif %}
+            </li>
+          {% empty %}
+            <li class="muted">{% t "Hozircha harakat yo'q." %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

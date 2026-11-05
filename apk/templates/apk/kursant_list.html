@@ -1,0 +1,62 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "Kursantlar" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% t "Kursantlar" %}</h1>
+    <p class="page-head__desc">{% t "Ro'yxatdagi faol kursantlar APK ishlarini ola oladi. Avval hisob yarating, so'ng shu yerga qo'shing." %}</p>
+  </div>
+  <div class="page-head__actions">
+    <a href="{% url 'apk:submission_list' %}" class="btn">{% t "APK ishlar" %}</a>
+    <a href="{% url 'apk:kursant_create' %}" class="btn btn--primary">{% t "Kursant qo'shish" %}</a>
+  </div>
+</header>
+
+{% include "apk/_toolbar.html" %}
+
+<section class="table-card">
+  <table class="table table--stack">
+    <thead>
+      <tr>
+        <th scope="col">{% t "Kursant" %}</th>
+        <th scope="col">{% t "Guruh" %}</th>
+        <th class="col-count" scope="col">{% t "Tartib" %}</th>
+        <th scope="col">{% t "Holat" %}</th>
+        <th class="col-count" scope="col">{% t "Olgan ishlari" %}</th>
+        <th class="col-count" scope="col">{% t "Qabul qilingan" %}</th>
+        <th class="col-action" scope="col"><span class="sr-only">{% t "Amal" %}</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for kursant in kursants %}
+        <tr>
+          <td data-label="{% t 'Kursant' %}">
+            <div>
+              <span class="cell-title">{{ kursant.user }}</span>
+              {% if kursant.user.account %}<span class="cell-sub">@{{ kursant.user.account.username }}</span>{% endif %}
+            </div>
+          </td>
+          <td data-label="{% t 'Guruh' %}">{{ kursant.team_label }}</td>
+          <td class="col-count" data-label="{% t 'Tartib' %}">{{ kursant.sort_order }}</td>
+          <td data-label="{% t 'Holat' %}">{% if kursant.is_active %}{% t "Faol" %}{% else %}<span class="muted">{% t "Faolsiz" %}</span>{% endif %}</td>
+          <td class="col-count" data-label="{% t 'Olgan ishlari' %}">{{ kursant.work_count }}</td>
+          <td class="col-count" data-label="{% t 'Qabul qilingan' %}">{{ kursant.accepted_count }}</td>
+          <td class="col-action" data-label="">
+            <a href="{% url 'apk:kursant_update' kursant.pk %}" class="btn btn--sm">{% t "Tahrirlash" %}</a>
+            {% t "Kursant ro'yxatdan olib tashlansinmi? Unga biriktirilgan ishlar saqlanadi." as delete_confirm %}
+            <form method="post" action="{% url 'apk:kursant_delete' kursant.pk %}" class="inline-form" data-confirm="{{ delete_confirm }}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--sm btn--danger">{% t "O'chirish" %}</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="empty" data-label="">{% t "Mos kursant topilmadi." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

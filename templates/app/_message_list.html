@@ -1,0 +1,14 @@
+{% load ui_i18n %}
+<ul class="message-list">
+  {% for item in items %}
+    <li>
+      <div class="message-list__top">
+        <strong>{{ item.sender_display }}</strong>
+        <time class="meta" datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"d.m.Y H:i" }}</time>
+      </div>
+      <p>{{ item.body|linebreaksbr }}</p>
+    </li>
+  {% empty %}
+    <li class="empty">{% t empty_text %}</li>
+  {% endfor %}
+</ul>

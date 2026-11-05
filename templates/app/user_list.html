@@ -1,0 +1,73 @@
+{% extends "app/base.html" %}
+{% load ui_i18n %}
+
+{% block title %}{% t "Foydalanuvchilar" %}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div>
+    <h1>{% t "Foydalanuvchilar" %}</h1>
+    <p class="page-head__desc">
+      {% if can_manage_users %}{% t "Barcha xizmat hisoblari. Kursant rolini «Kursantlar» bo'limida bering." %}{% else %}{% t "Sizning hisobingiz." %}{% endif %}
+    </p>
+  </div>
+  {% if can_manage_users %}
+    <div class="page-head__actions">
+      <a href="{% url 'app:user_create' %}" class="btn btn--primary">{% t "Yangi foydalanuvchi" %}</a>
+    </div>
+  {% endif %}
+</header>
+
+<form method="get" class="filterbar" role="search">
+  {% for field in filter_form %}
+    <label class="filterbar__select">
+      {{ field.label }}
+      {{ field }}
+    </label>
+  {% endfor %}
+  <button type="submit" class="btn">{% t "Qidirish" %}</button>
+  <a href="{% url 'app:user_list' %}" class="btn">{% t "Tozalash" %}</a>
+  <span class="filterbar__count">{% t "Natija" %}: <strong>{{ filtered_user_count }}</strong> / {{ total_visible_user_count }}</span>
+</form>
+
+<section class="table-card">
+  <table class="table table--stack">
+    <thead>
+      <tr>
+        <th scope="col">{% t "Ism" %}</th>
+        <th scope="col">{% t "Login" %}</th>
+        <th scope="col">{% t "Rol" %}</th>
+        <th scope="col">{% t "Guruh" %}</th>
+        <th class="col-action" scope="col"><span class="sr-only">{% t "Amal" %}</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td data-label="{% t 'Ism' %}"><span class="cell-title">{{ user.first_name }} {{ user.last_name }}</span></td>
+          <td data-label="{% t 'Login' %}">{% if user.account %}@{{ user.account.username }}{% else %}<span class="muted">{% t "Login biriktirilmagan" %}</span>{% endif %}</td>
+          <td data-label="{% t 'Rol' %}">{{ user.role_label }}</td>
+          <td data-label="{% t 'Guruh' %}"><span>{% if user.account %}{% for group in user.account.groups.all %}{{ group.name|ui_group }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}{% else %}—{% endif %}</span></td>
+          <td class="col-action" data-label="">
+            {% if can_manage_users or user.account_id == request.user.id %}
+              {% if user.account and can_manage_users %}
+                <a href="{% url 'app:message_thread' user.pk %}" class="btn btn--sm">{% t "Xabar" %}</a>
+              {% endif %}
+              <a href="{% url 'app:user_update' user.pk %}" class="btn btn--sm">{% t "Tahrirlash" %}</a>
+              {% if can_manage_users %}
+                {% t "Foydalanuvchi o'chirilsinmi?" as delete_confirm %}
+                <form method="post" action="{% url 'app:user_delete' user.pk %}" class="inline-form" data-confirm="{{ delete_confirm }}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn--sm btn--danger">{% t "O'chirish" %}</button>
+                </form>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="empty" data-label="">{% t "Foydalanuvchi topilmadi." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

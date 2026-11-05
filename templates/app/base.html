@@ -1,0 +1,124 @@
+{% load static ui_i18n %}<!doctype html>
+<html lang="{{ ui_language }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{% t "APK tahlil" %}{% endblock %} · Chilonzor</title>
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      /* Saqlangan mavzuni CSS yuklanishidan oldin qo'yish - sahifa "miltillamasin". */
+      try {
+        var savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        }
+      } catch (error) {}
+    </script>
+    <link rel="preload" href="{% static 'app/fonts/inter-latin.woff2' %}" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="{% static 'app/tokens.css' %}?v=20261102-13" />
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}?v=20261103-1" />
+    <script src="{% static 'app/ui.js' %}?v=20261102-13" defer></script>
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__inner">
+        <a href="{% url 'app:home' %}" class="brand">
+          {% include "app/_brand_mark.html" %}
+          <span class="brand__text">Chilonzor <span class="brand__sep">·</span> {% t "APK tahlil" %}</span>
+        </a>
+
+        {% if request.user.is_authenticated %}
+        <button type="button" class="btn btn--icon nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="mainNav" aria-label="{% t 'Menyu' %}">&#9776;</button>
+
+        <nav class="nav" id="mainNav" aria-label="{% t 'Asosiy menyu' %}">
+          {% block nav_extra %}{% endblock %}
+
+          {% if show_apk_nav %}
+          <a href="{% url 'apk:submission_list' %}"
+             class="nav__link{% if request.resolver_match.app_name == 'apk' and request.resolver_match.url_name != 'review_queue' and request.resolver_match.url_name != 'dashboard' %} is-active{% endif %}">
+            {% t "APK ishlar" %}
+            {% if apk_returned_count %}
+              <span class="nav__badge nav__badge--danger" title="{% t 'Tuzatish uchun qaytarilgan' %}">{{ apk_returned_count }}</span>
+            {% elif apk_new_count %}
+              <span class="nav__badge" title="{% t 'Olinmagan yangi APK' %}">{% if apk_new_count > 99 %}99+{% else %}{{ apk_new_count }}{% endif %}</span>
+            {% endif %}
+          </a>
+
+          {% if is_chilonzor_user or request.user.is_staff %}
+          <a href="{% url 'apk:review_queue' %}" class="nav__link{% if request.resolver_match.url_name == 'review_queue' %} is-active{% endif %}">
+            {% t "Ko'rib chiqish" %}
+            {% if apk_review_count %}
+              <span class="nav__badge" title="{% t 'Qaror kutmoqda' %}">{% if apk_review_count > 99 %}99+{% else %}{{ apk_review_count }}{% endif %}</span>
+            {% endif %}
+          </a>
+          {% endif %}
+
+          {% if request.user.is_staff or is_chilonzor_user or apk_role_label == "MVD" %}
+          <a href="{% url 'apk:dashboard' %}" class="nav__link{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}">{% t "Statistika" %}</a>
+          {% endif %}
+          {% endif %}
+
+          <a href="{% url 'app:message_inbox' %}" class="nav__link{% if request.resolver_match.url_name == 'message_inbox' or request.resolver_match.url_name == 'message_thread' %} is-active{% endif %}">
+            {% t "Xabarlar" %}
+            {% if message_unread_count %}
+              <span class="nav__badge">{% if message_unread_count > 99 %}99+{% else %}{{ message_unread_count }}{% endif %}</span>
+            {% endif %}
+          </a>
+
+          {% if request.user.is_staff %}
+          <a href="{% url 'app:user_list' %}" class="nav__link{% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_update' %} is-active{% endif %}">{% t "Foydalanuvchilar" %}</a>
+          <a href="{% url 'app:group_list' %}" class="nav__link{% if request.resolver_match.url_name == 'group_list' or request.resolver_match.url_name == 'group_create' or request.resolver_match.url_name == 'group_update' %} is-active{% endif %}">{% t "Guruhlar" %}</a>
+          {% endif %}
+        </nav>
+        {% endif %}
+
+        <div class="topbar__right">
+          <button type="button" class="btn btn--icon theme-toggle" data-theme-toggle
+                  aria-label="{% t 'Tungi rejim' %}" title="{% t 'Tungi rejim' %}"
+                  data-label-dark="{% t 'Tungi rejim' %}" data-label-light="{% t 'Kunduzgi rejim' %}">
+            <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <form method="post" action="{% url 'app:set_language' %}" class="inline-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+            <label for="languageSelect" class="sr-only">{% t "Til" %}</label>
+            <select id="languageSelect" name="language" class="lang-select" onchange="this.form.submit()">
+              {% for language in ui_languages %}
+                <option value="{{ language.code }}"{% if language.code == ui_language %} selected{% endif %}>{{ language.code|upper }}</option>
+              {% endfor %}
+            </select>
+          </form>
+
+          {% if request.user.is_authenticated %}
+            {% with profile=request.user.profile %}
+            <span class="user-chip">
+              {% if profile.last_name %}{{ profile.first_name|slice:":1" }}. {{ profile.last_name }}{% else %}{{ profile.first_name|default:request.user.username }}{% endif %}
+              {% if apk_role_label %}<span class="user-chip__role">· {{ apk_role_label }}</span>{% elif request.user.is_staff %}<span class="user-chip__role">· {% t "Admin" %}</span>{% endif %}
+            </span>
+            {% endwith %}
+            <form method="post" action="{% url 'app:logout' %}" class="inline-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--sm">{% t "Chiqish" %}</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      {% if messages %}
+        <div class="alerts" role="status">
+          {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>
